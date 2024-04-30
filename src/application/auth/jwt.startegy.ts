@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Account } from '../../domain/account/account.entity';
+import { User } from '../../domain/user/user.entity';
 
 @Injectable()
 export class JWTGuard implements CanActivate {
@@ -27,7 +27,7 @@ export class JWTGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify(jwt);
-      request.user = await this.em.findOneOrFail(Account, payload.id);
+      request.user = await this.em.findOneOrFail(User, payload.id);
       return true;
     } catch (e) {
       console.log(e);

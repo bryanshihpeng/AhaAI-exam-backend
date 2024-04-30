@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as SgMail from '@sendgrid/mail';
 import axios from 'axios';
 import * as jwt from 'jsonwebtoken';
-import { Account } from '../../domain/account/account.entity';
+import { User } from '../../domain/user/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -13,13 +13,13 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(email: string, password: string): Promise<Account> {
-    const existingAccount = await this.em.find(Account, { email });
+  async signUp(email: string, password: string): Promise<User> {
+    const existingAccount = await this.em.find(User, { email });
     if (existingAccount) {
       throw new BadRequestException('Account with this email already exists');
     }
 
-    const newAccount = Account.createWithEmailAndPassword(email, password);
+    const newAccount = User.createWithEmailAndPassword(email, password);
 
     await this.em.persistAndFlush(newAccount);
 
@@ -28,7 +28,7 @@ export class AuthService {
   }
 
   async signIn(email: string, password: string): Promise<string> {
-    const account = await this.em.findOne(Account, { email });
+    const account = await this.em.findOne(User, { email });
     if (!account) {
       throw new BadRequestException('Account not found');
     }
@@ -38,7 +38,7 @@ export class AuthService {
     return this.generateJwt(account);
   }
 
-  async sendVerificationEmail(account: Account): Promise<void> {
+  async sendVerificationEmail(account: User): Promise<void> {
     const emailVerificationToken = this.jwtService.sign(
       {
         id: account.id,
@@ -62,7 +62,7 @@ export class AuthService {
     if (!id) {
       throw new BadRequestException('Invalid token');
     }
-    const account = await this.em.findOne(Account, { id });
+    const account = await this.em.findOne(User, { id });
     if (!account) {
       throw new BadRequestException('Invalid token');
     }
@@ -72,7 +72,7 @@ export class AuthService {
     return this.generateJwt(account);
   }
 
-  generateJwt(account: Account): string {
+  generateJwt(account: User): string {
     return this.jwtService.sign({ id: account.id });
   }
 
@@ -81,7 +81,7 @@ export class AuthService {
     password: string,
     newPassword: string,
   ): Promise<void> {
-    const account = await this.em.findOne(Account, { email });
+    const account = await this.em.findOne(User, { email });
     if (!account) {
       throw new BadRequestException('Account not found');
     }
@@ -91,7 +91,7 @@ export class AuthService {
 
   async signInWithFirebase(idToken: string): Promise<string> {
     const firebaseUid = await this.validateFirebaseIdToken(idToken);
-    const account = await this.em.findOne(Account, { firebaseUid });
+    const account = await this.em.findOne(User, { firebaseUid });
     if (account) {
       return this.generateJwt(account);
     }
@@ -99,18 +99,18 @@ export class AuthService {
 
   async signUpWithFirebase(idToken: string): Promise<string> {
     const firebaseUid = await this.validateFirebaseIdToken(idToken);
-    const account = await this.em.findOne(Account, { firebaseUid });
+    const account = await this.em.findOne(User, { firebaseUid });
     if (account) {
       return this.jwtService.sign({ id: account.id });
     }
-    const newAccount = new Account();
+    const newAccount = new User();
     newAccount.firebaseUid = firebaseUid;
     await this.em.persistAndFlush(newAccount);
     return this.generateJwt(newAccount);
   }
 
   async validateFirebaseIdToken(idToken: string): Promise<string> {
-    const decodedToken = jwt.decode(idToken, { complete: true });
+    const decodedToken = jwt.decode(idToken);
     if (
       !decodedToken ||
       typeof decodedToken !== 'object' ||

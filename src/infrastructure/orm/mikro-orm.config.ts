@@ -1,12 +1,12 @@
 import { Migrator } from '@mikro-orm/migrations';
 import { defineConfig, Options, PostgreSqlDriver } from '@mikro-orm/postgresql';
 import * as dotenv from 'dotenv';
-import { Account } from '../../domain/account/account.entity';
+import { User } from '../../domain/user/user.entity';
 
 dotenv.config();
 
 export const dbConfig: Options = {
-  entities: [Account],
+  entities: [User],
   driver: PostgreSqlDriver,
   dbName: process.env.DB_DATABASE,
   host: process.env.DB_HOST,

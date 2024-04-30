@@ -1,14 +1,11 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Body, Controller, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { JWTGuard } from '../auth/jwt.strategy';
-
-@ApiTags('Authentication')
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { SignupWithEmailRequest } from './dto/signup-with-email.request';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(

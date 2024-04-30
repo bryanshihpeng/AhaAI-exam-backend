@@ -2,7 +2,7 @@ import { BaseEntity, Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { BadRequestException } from '@nestjs/common';
 
 @Entity()
-export class Account extends BaseEntity {
+export class User extends BaseEntity {
   @PrimaryKey({ type: 'number' })
   id!: number;
 
@@ -21,13 +21,13 @@ export class Account extends BaseEntity {
   @Property({ nullable: true })
   password?: string;
 
-  static createWithEmailAndPassword(email: string, password: string): Account {
+  static createWithEmailAndPassword(email: string, password: string): User {
     if (!email || !password) throw new Error('Email and password are required');
-    const account = new Account();
-    account.email = email;
-    account.emailVerified = false;
-    account.setPassword(password);
-    return account;
+    const user = new User();
+    user.email = email;
+    user.emailVerified = false;
+    user.setPassword(password);
+    return user;
   }
 
   resetPassword(password: string, newPassword: string): void {
