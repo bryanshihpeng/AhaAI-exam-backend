@@ -1,5 +1,9 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { JWTGuard } from '../auth/jwt.strategy';
+
+@ApiTags('Authentication')
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from '../services/auth.service';
@@ -28,6 +32,15 @@ export class AuthController {
   }
 
   @Post('signin')
+  @ApiOperation({ summary: 'Sign in with email and password' })
+  @ApiResponse({
+    status: 200,
+    description: 'Sign in successful, JWT provided',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request, invalid credentials',
+  })
   async signInWithEmail(
     @Body() body: SignupWithEmailRequest,
     @Res() response: Response,
@@ -37,18 +50,41 @@ export class AuthController {
   }
 
   @Post('verify-email')
+  @ApiOperation({ summary: 'Verify email and sign in' })
+  @ApiResponse({
+    status: 200,
+    description: 'Email verified and sign in successful, JWT provided',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request, invalid or expired token',
+  })
   async verifyEmailAndSignIn(@Body() token: string, @Res() response: Response) {
     const jwt = await this.authService.verifyEmail(token);
     this.respondJwt(jwt, response);
   }
 
   @Post('firebase')
+  @ApiOperation({ summary: 'Sign in with Firebase token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Sign in successful, JWT provided',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request, invalid Firebase token',
+  })
   async signInWithFirebase(@Body() token: string, @Res() response: Response) {
     const jwt = await this.authService.signInWithFirebase(token);
     this.respondJwt(jwt, response);
   }
 
   @Post('logout')
+  @ApiOperation({ summary: 'Logout the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout successful',
+  })
   logout(@Res() response: Response) {
     response.clearCookie('jwt');
     response.status(HttpStatus.OK).json({});
