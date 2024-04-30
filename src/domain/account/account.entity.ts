@@ -9,6 +9,12 @@ export class Account extends BaseEntity {
   @Property({ unique: true, nullable: true })
   email: string;
 
+  @Property()
+  displayName = '';
+
+  @Property({ nullable: true })
+  firebaseUid?: string;
+
   @Property({ nullable: true })
   emailVerified?: boolean;
 
@@ -24,6 +30,16 @@ export class Account extends BaseEntity {
     return account;
   }
 
+  resetPassword(password: string, newPassword: string): void {
+    if (!this.password) {
+      throw new BadRequestException('Account does not have a password');
+    }
+    if (this.password !== password) {
+      throw new BadRequestException('Invalid password');
+    }
+    this.setPassword(newPassword);
+  }
+
   setPassword(password: string): void {
     if (!this.validatePassword(password)) {
       throw new BadRequestException(
@@ -31,6 +47,10 @@ export class Account extends BaseEntity {
       );
     }
     this.password = password;
+  }
+
+  verifyPassword(password: string): boolean {
+    return this.password === password;
   }
 
   validatePassword(password: string): boolean {
