@@ -11,8 +11,11 @@ export class AuthService {
     if (existingAccount) {
       throw new BadRequestException('Account with this email already exists');
     }
+
     const newAccount = Account.createWithEmailAndPassword(email, password);
+
     await this.em.persistAndFlush(newAccount);
+
     await this.sendVerificationEmail(newAccount);
     return newAccount;
   }
