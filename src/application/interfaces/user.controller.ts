@@ -97,3 +97,43 @@ export class UserController {
     };
   }
 }
+import { UpdateUserProfileRequest } from './dto/update-user-profile.request';
+import { ResetPasswordRequest } from './dto/reset-password.request';
+
+  @Get('profile')
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile data',
+    type: User,
+  })
+  async getUserProfile(@CurrentUser() user: User) {
+    return { email: user.email, name: user.name };
+  }
+
+  @Patch('profile')
+  @ApiOperation({ summary: 'Update user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile updated',
+  })
+  async updateUserProfile(@CurrentUser() user: User, @Body() body: UpdateUserProfileRequest) {
+    user.name = body.name;
+    await this.em.persistAndFlush(user);
+    return { email: user.email, name: user.name };
+  }
+
+  @Patch('reset-password')
+  @ApiOperation({ summary: 'Reset user password' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Password reset failed',
+  })
+  async resetPassword(@CurrentUser() user: User, @Body() body: ResetPasswordRequest) {
+    user.resetPassword(body.oldPassword, body.newPassword, body.confirmNewPassword);
+    await this.em.persistAndFlush(user);
+  }
