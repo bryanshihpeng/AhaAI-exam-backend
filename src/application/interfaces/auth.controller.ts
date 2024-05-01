@@ -30,14 +30,21 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'Registration successful, verification email sent',
-    type: User,
   })
   @ApiResponse({
     status: 400,
     description: 'Bad Request, account with this email already exists',
   })
-  async signUpWithEmail(@Body() body: SignupWithEmailRequest) {
-    return this.authService.signUpWithEmail(body.email, body.password);
+  async signUpWithEmail(
+    @Body() body: SignupWithEmailRequest,
+    @Res() response: Response,
+  ) {
+    const user = await this.authService.signUpWithEmail(
+      body.email,
+      body.password,
+    );
+    const jwt = this.authService.generateJwt(user);
+    return this.respondJwt(jwt, response, HttpStatus.CREATED);
   }
 
   @Post('signin')
@@ -105,15 +112,6 @@ export class AuthController {
     response.status(HttpStatus.OK).json({});
   }
 
-  respondJwt(jwt: string, response: Response) {
-    response.cookie('jwt', jwt, {
-      httpOnly: true,
-      secure: true,
-      domain: process.env.COOKIE_DOMAIN,
-    });
-    response.status(HttpStatus.OK).json({});
-  }
-
   @UseGuards(JwtGuard)
   @Post('send-verification-email')
   @ApiOperation({ summary: 'Send verification email' })
@@ -123,5 +121,19 @@ export class AuthController {
   })
   async sendVerificationEmail(@CurrentUser() user: User) {
     return this.authService.sendVerificationEmail(user);
+  }
+
+  respondJwt(
+    jwt: string,
+    response: Response,
+    statusCode = HttpStatus.OK,
+    body?: any,
+  ) {
+    response.cookie('jwt', jwt, {
+      // httpOnly: true,
+      // secure: true,
+      domain: process.env.COOKIE_DOMAIN,
+    });
+    response.status(statusCode).json(body);
   }
 }

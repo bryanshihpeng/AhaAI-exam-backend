@@ -24,7 +24,7 @@ export class UserController {
     type: UserProfileResponse,
   })
   async getUserProfile(@CurrentUser() user: User) {
-    return user.toObject(['password']);
+    return user.toObject();
   }
 
   @Patch('profile')

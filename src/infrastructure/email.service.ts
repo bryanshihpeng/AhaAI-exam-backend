@@ -14,10 +14,15 @@ export class EmailService {
   ): Promise<void> {
     const msg = {
       to: to,
-      from: process.env.EMAIL_FROM_ADDRESS, // Now using environment variable
+      from: process.env.SENDGRID_EMAIL_FROM_ADDRESS, // Now using environment variable
       subject: subject,
       html: htmlContent,
     };
-    await SgMail.send(msg);
+    try {
+      const res = await SgMail.send(msg);
+      console.log('Email sent:', res);
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { BaseEntity, Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { BadRequestException } from '@nestjs/common';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { v4 } from 'uuid';
 
 @Entity()
@@ -59,11 +59,14 @@ export class User extends BaseEntity {
     return bcrypt.hashSync(password, saltRounds);
   }
 
-  private verifyPassword(password: string): boolean {
+  verifyPassword(password: string) {
     if (!this.password) {
       throw new BadRequestException('Account does not have a password');
     }
-    return this.password == this.hashPassword(password);
+    const isVerified = bcrypt.compareSync(password, this.password);
+    if (!isVerified) {
+      throw new BadRequestException('Invalid password');
+    }
   }
 
   private validatePassword(password: string): boolean {

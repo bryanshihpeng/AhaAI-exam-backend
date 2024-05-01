@@ -37,33 +37,22 @@ export class AuthService {
     if (!account) {
       throw new BadRequestException('Account not found');
     }
-    if (!account.verifyPassword(password)) {
-      throw new BadRequestException('Invalid password');
-    }
+    account.verifyPassword(password);
     this.eventEmitter.emit('user.logged.in', new UserLoggedInEvent(account.id));
     return this.generateJwt(account);
   }
 
-  async sendVerificationEmail(account: User): Promise<void> {
-    const emailVerificationToken = this.jwtService.sign(
-      {
-        id: account.id,
-      },
-      { expiresIn: '15m' },
-    );
-    const emailContent = `<a href="${process.env.FRONTEND_URL}/sign-in?emailToken=${emailVerificationToken}">Verify Email</a>`;
+  async sendVerificationEmail(user: User): Promise<void> {
+    const emailContent = `<a href="${this.generateVerificationUrl(user)}">Verify Email</a>`;
     await this.emailService.sendEmail(
-      account.email,
+      user.email,
       'Please verify your email address',
       emailContent,
     );
   }
 
   async verifyEmail(token: string) {
-    const { id } = this.jwtService.verify(token);
-    if (!id) {
-      throw new BadRequestException('Invalid token');
-    }
+    const { id } = this.verifyJwt(token);
     const account = await this.em.findOne(User, { id });
     if (!account) {
       throw new BadRequestException('Invalid token');
@@ -72,6 +61,14 @@ export class AuthService {
     await this.em.persistAndFlush(account);
 
     return this.generateJwt(account);
+  }
+
+  verifyJwt(token: string) {
+    try {
+      return this.jwtService.verify(token);
+    } catch (error) {
+      throw new BadRequestException('Invalid token');
+    }
   }
 
   generateJwt(account: User): string {
@@ -144,5 +141,10 @@ export class AuthService {
     } catch (error) {
       throw new BadRequestException('Invalid token signature');
     }
+  }
+
+  private generateVerificationUrl(user: User): string {
+    const emailVerificationToken = this.generateJwt(user);
+    return `${process.env.FRONTEND_URL}/sign-in?emailToken=${emailVerificationToken}`;
   }
 }

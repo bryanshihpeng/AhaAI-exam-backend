@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../../../domain/user/user.entity';
 
 export class UserProfileResponse {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
@@ -24,4 +25,15 @@ export class UserProfileResponse {
 
   @ApiProperty({ example: false })
   emailVerified: boolean;
+
+  constructor(user: User) {
+    this.id = user.id;
+    this.signUpAt = user.signUpAt;
+    this.loginCount = user.loginCount;
+    this.lastSessionAt = user.lastSessionAt;
+    this.email = user.email;
+    this.name = user.name;
+    this.firebaseUid = user.firebaseUid;
+    this.emailVerified = user.emailVerified;
+  }
 }

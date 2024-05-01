@@ -22,11 +22,8 @@ export class JwtGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     // Extract JWT from cookies
-    const jwt = request.cookies ? request.cookies['jwt'] : null;
-    if (!jwt) {
-      console.log('No JWT provided');
-      throw new UnauthorizedException();
-    }
+    const jwt = this.extractJwt(request);
+    if (!jwt) throw new UnauthorizedException();
 
     try {
       const payload = this.jwtService.verify(jwt);
@@ -40,5 +37,12 @@ export class JwtGuard implements CanActivate {
       console.log(e);
       throw new UnauthorizedException();
     }
+  }
+
+  extractJwt(request: any): string | null {
+    const jwt = request.cookies ? request.cookies['jwt'] : null;
+    if (jwt) return jwt;
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 }
