@@ -7,6 +7,15 @@ export class User extends BaseEntity {
   @PrimaryKey()
   id = v4();
 
+  @Property({ type: 'datetime', defaultRaw: 'NOW()' })
+  signUpAt = new Date();
+
+  @Property({ type: 'number', default: 0 })
+  loginCount = 0;
+
+  @Property({ type: 'datetime', defaultRaw: 'NOW()' })
+  lastSessionAt?: Date;
+
   @Property({ unique: true, nullable: true })
   email: string;
 
