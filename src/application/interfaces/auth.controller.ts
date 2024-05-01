@@ -91,7 +91,7 @@ export class AuthController {
   }
 
   respondJwt(jwt: string, response: Response) {
-    response.cookie('jwt', jwt, { httpOnly: true });
+    response.cookie('jwt', jwt, { httpOnly: true, domain: 'localhost' });
     response.status(HttpStatus.OK).json({});
   }
 }

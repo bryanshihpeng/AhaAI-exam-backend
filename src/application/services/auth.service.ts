@@ -90,26 +90,22 @@ export class AuthService {
   }
 
   async signInWithFirebase(idToken: string): Promise<string> {
-    const firebaseUid = await this.validateFirebaseIdToken(idToken);
-    const account = await this.em.findOne(User, { firebaseUid });
+    const payload = await this.validateFirebaseIdToken(idToken);
+    const account = await this.em.findOne(User, {
+      firebaseUid: payload.firebaseUid,
+    });
     if (account) {
       return this.generateJwt(account);
     }
-  }
-
-  async signUpWithFirebase(idToken: string): Promise<string> {
-    const firebaseUid = await this.validateFirebaseIdToken(idToken);
-    const account = await this.em.findOne(User, { firebaseUid });
-    if (account) {
-      return this.jwtService.sign({ id: account.id });
-    }
     const newAccount = new User();
-    newAccount.firebaseUid = firebaseUid;
+    newAccount.firebaseUid = payload.firebaseUid;
+    newAccount.name = payload.displayName;
+    newAccount.email = payload.email;
     await this.em.persistAndFlush(newAccount);
     return this.generateJwt(newAccount);
   }
 
-  async validateFirebaseIdToken(idToken: string): Promise<string> {
+  async validateFirebaseIdToken(idToken: string) {
     const decodedToken = jwt.decode(idToken, { complete: true });
     if (
       !decodedToken ||
@@ -130,11 +126,17 @@ export class AuthService {
       throw new BadRequestException('Invalid key ID');
     }
     try {
-      const { sub } = jwt.verify(idToken, publicKey, { algorithms: ['RS256'] });
-      if (!sub || typeof sub !== 'string') {
+      const jwtPayload = jwt.verify(idToken, publicKey, {
+        algorithms: ['RS256'],
+      });
+      if (!jwtPayload['sub'] || typeof jwtPayload['sub'] !== 'string') {
         throw new BadRequestException('Invalid token subject');
       }
-      return sub;
+      return {
+        firebaseUid: jwtPayload['sub'],
+        displayName: jwtPayload['name'] || '',
+        email: jwtPayload['email'] || '',
+      };
     } catch (error) {
       throw new BadRequestException('Invalid token signature');
     }

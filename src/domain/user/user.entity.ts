@@ -1,16 +1,17 @@
 import { BaseEntity, Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { BadRequestException } from '@nestjs/common';
+import { v4 } from 'uuid';
 
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryKey({ type: 'number' })
-  id!: number;
+  @PrimaryKey()
+  id = v4();
 
   @Property({ unique: true, nullable: true })
   email: string;
 
   @Property()
-  displayName = '';
+  name = '';
 
   @Property({ nullable: true })
   firebaseUid?: string;
