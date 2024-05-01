@@ -13,7 +13,7 @@ import * as process from 'process';
 import { User } from '../../domain/user/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { JWTGuard } from '../auth/jwt.guard';
+import { JwtGuard } from '../auth/jwt-guard.service';
 import { SignupWithEmailRequest } from './dto/signup-with-email.request';
 
 @ApiTags('Authentication')
@@ -114,7 +114,7 @@ export class AuthController {
     response.status(HttpStatus.OK).json({});
   }
 
-  @UseGuards(JWTGuard)
+  @UseGuards(JwtGuard)
   @Post('send-verification-email')
   @ApiOperation({ summary: 'Send verification email' })
   @ApiResponse({

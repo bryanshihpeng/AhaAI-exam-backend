@@ -3,7 +3,7 @@ import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '../../domain/user/user.entity';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { JWTGuard } from '../auth/jwt.guard';
+import { JwtGuard } from '../auth/jwt-guard.service';
 import { ResetPasswordRequest } from './dto/reset-password.request';
 import { UpdateUserProfileRequest } from './dto/update-user-profile.request';
 import { UserDashboardResponse } from './dto/user-dashboard.response';
@@ -11,7 +11,7 @@ import { UserProfileResponse } from './dto/user-profile.response';
 import { UserStatisticsResponse } from './dto/user-statistics.response';
 
 @ApiTags('User')
-@UseGuards(JWTGuard)
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
   constructor(private em: EntityManager) {}

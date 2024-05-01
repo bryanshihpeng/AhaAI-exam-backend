@@ -11,7 +11,7 @@ import { User } from '../../domain/user/user.entity';
 import { UserActivityHappenedEvent } from '../user/user-activity.event';
 
 @Injectable()
-export class JWTGuard implements CanActivate {
+export class JwtGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private em: EntityManager,
