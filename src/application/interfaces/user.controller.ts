@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '../../domain/user/user.entity';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -18,13 +18,27 @@ import { UserStatisticsResponse } from './dto/user-statistics.response';
 //   If future read-only operations become more complex or need to be reused, we can consider abstracting them into the service layer.
 //   Conclusion:
 // When implementing read-only operations, consider the CQRS model, separating them from command operations.
-//   For simple read-only operations, they can be directly implemented in the Controller to avoid over-engineering.
+//   For read-only operations, they can be directly implemented in the Controller to avoid over-engineering.
 //   Only consider abstracting them into the service layer when further optimization and reuse are needed.
 
 @ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private em: EntityManager) {}
+
+  @UseGuards(JWTGuard)
+  @Patch('profile')
+  async updateProfile(@CurrentUser() user: User, @Body() body: any) {
+    user.name = body.name;
+    await this.em.persistAndFlush(user);
+    return user.toObject(['password']);
+  }
+
+  @UseGuards(JWTGuard)
+  @Patch('reset-password')
+  async resetPassword(@CurrentUser() user: User, @Body() body: any) {
+    // user.resetPassword(body.password);
+  }
 
   @UseGuards(JWTGuard)
   @Get('profile')
