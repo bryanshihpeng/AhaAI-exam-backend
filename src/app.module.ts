@@ -12,7 +12,6 @@ import { dbConfig } from './infrastructure/orm/mikro-orm.config';
     JwtModule.register({
       global: true,
       secret: 'jwtConstants.secret',
-      signOptions: { expiresIn: '60s' },
     }),
   ],
   controllers: [UserController, AuthController],

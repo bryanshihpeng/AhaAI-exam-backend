@@ -13,6 +13,6 @@ export class UserController {
   @UseGuards(JWTGuard)
   @Get('profile')
   async getProfile(@CurrentUser() user: User) {
-    return user.toObject(['password', 'firebaseUid']);
+    return user.toObject(['password']);
   }
 }
