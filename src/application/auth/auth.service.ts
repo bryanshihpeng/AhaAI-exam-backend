@@ -2,10 +2,11 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
-import * as SgMail from '@sendgrid/mail';
 import axios from 'axios';
 import * as jwt from 'jsonwebtoken';
+import * as process from 'process';
 import { User } from '../../domain/user/user.entity';
+import { EmailService } from '../../infrastructure/email.service';
 import { UserLoggedInEvent } from '../user/user-activity.event';
 
 @Injectable()
@@ -14,10 +15,11 @@ export class AuthService {
     private em: EntityManager,
     private jwtService: JwtService,
     private eventEmitter: EventEmitter2,
+    private emailService: EmailService,
   ) {}
 
-  async signUp(email: string, password: string): Promise<User> {
-    const existingAccount = await this.em.find(User, { email });
+  async signUpWithEmail(email: string, password: string): Promise<User> {
+    const existingAccount = await this.em.findOne(User, { email });
     if (existingAccount) {
       throw new BadRequestException('Account with this email already exists');
     }
@@ -47,18 +49,14 @@ export class AuthService {
       {
         id: account.id,
       },
-      // expire the token in 15 minutes
-      // { expiresIn: '15m' },
+      { expiresIn: '15m' },
     );
-    SgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const msg = {
-      to: account.email,
-      from: 'bryanshihpeng@gmail.com',
-      subject: 'Please verify your email address',
-      text: 'Please verify your email address',
-      html: `<a href="http://localhost:3000/verify-email/${emailVerificationToken}">Verify Email</a>`,
-    };
-    await SgMail.send(msg);
+    const emailContent = `<a href="${process.env.FRONTEND_URL}/sign-in?emailToken=${emailVerificationToken}">Verify Email</a>`;
+    await this.emailService.sendEmail(
+      account.email,
+      'Please verify your email address',
+      emailContent,
+    );
   }
 
   async verifyEmail(token: string) {
@@ -80,19 +78,6 @@ export class AuthService {
     return this.jwtService.sign({ id: account.id });
   }
 
-  async resetPassword(
-    email: string,
-    password: string,
-    newPassword: string,
-  ): Promise<void> {
-    const account = await this.em.findOne(User, { email });
-    if (!account) {
-      throw new BadRequestException('Account not found');
-    }
-    account.resetPassword(password, newPassword);
-    await this.em.persistAndFlush(account);
-  }
-
   async signInWithFirebase(idToken: string): Promise<string> {
     const payload = await this.validateFirebaseIdToken(idToken);
     const account = await this.em.findOne(User, {
@@ -101,10 +86,25 @@ export class AuthService {
     if (account) {
       return this.generateJwt(account);
     }
+
+    // Check if the email is already registered
+    const existingAccount = await this.em.findOne(User, {
+      email: payload.email,
+    });
+    // Assuming that we trust google to verify the email
+    if (existingAccount) {
+      existingAccount.firebaseUid = payload.firebaseUid;
+      existingAccount.emailVerified = true;
+      await this.em.persistAndFlush(existingAccount);
+      return this.generateJwt(existingAccount);
+    }
+
+    // Create a new account
     const newAccount = new User();
     newAccount.firebaseUid = payload.firebaseUid;
     newAccount.name = payload.displayName;
     newAccount.email = payload.email;
+    newAccount.emailVerified = true;
     await this.em.persistAndFlush(newAccount);
     return this.generateJwt(newAccount);
   }

@@ -1,8 +1,18 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { User } from '../../domain/user/user.entity';
 import { AuthService } from '../auth/auth.service';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { JWTGuard } from '../auth/jwt.guard';
 import { SignupWithEmailRequest } from './dto/signup-with-email.request';
 
 @ApiTags('Authentication')
@@ -25,7 +35,7 @@ export class AuthController {
     description: 'Bad Request, account with this email already exists',
   })
   async signUpWithEmail(@Body() body: SignupWithEmailRequest) {
-    return this.authService.signUp(body.email, body.password);
+    return this.authService.signUpWithEmail(body.email, body.password);
   }
 
   @Post('signin')
@@ -56,8 +66,11 @@ export class AuthController {
     status: 400,
     description: 'Bad Request, invalid or expired token',
   })
-  async verifyEmailAndSignIn(@Body() token: string, @Res() response: Response) {
-    const jwt = await this.authService.verifyEmail(token);
+  async verifyEmailAndSignIn(
+    @Body() body: { token: string },
+    @Res() response: Response,
+  ) {
+    const jwt = await this.authService.verifyEmail(body.token);
     this.respondJwt(jwt, response);
   }
 
@@ -93,5 +106,16 @@ export class AuthController {
   respondJwt(jwt: string, response: Response) {
     response.cookie('jwt', jwt, { httpOnly: true, domain: 'localhost' });
     response.status(HttpStatus.OK).json({});
+  }
+
+  @UseGuards(JWTGuard)
+  @Post('send-verification-email')
+  @ApiOperation({ summary: 'Send verification email' })
+  @ApiResponse({
+    status: 200,
+    description: 'Verification email sent',
+  })
+  async sendVerificationEmail(@CurrentUser() user: User) {
+    return this.authService.sendVerificationEmail(user);
   }
 }

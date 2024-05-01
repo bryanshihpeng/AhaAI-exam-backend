@@ -8,6 +8,7 @@ import { AuthService } from './application/auth/auth.service';
 import { AuthController } from './application/interfaces/auth.controller';
 import { UserController } from './application/interfaces/user.controller';
 import { UserSessionService } from './application/user/user-session.service';
+import { EmailService } from './infrastructure/email.service';
 import { dbConfig } from './infrastructure/orm/mikro-orm.config';
 
 @Module({
@@ -24,6 +25,6 @@ import { dbConfig } from './infrastructure/orm/mikro-orm.config';
     EventEmitterModule.forRoot(),
   ],
   controllers: [UserController, AuthController],
-  providers: [AuthService, UserSessionService],
+  providers: [AuthService, UserSessionService, EmailService],
 })
 export class AppModule {}

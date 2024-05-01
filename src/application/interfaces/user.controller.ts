@@ -121,7 +121,7 @@ export class UserController {
     return {
       totalUsers,
       activeToday,
-      averageActive,
+      averageActive: Number(averageActive.toFixed(2)),
     };
   }
 }

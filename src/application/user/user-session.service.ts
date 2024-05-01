@@ -19,23 +19,28 @@ export class UserSessionService {
     // In memory cache, can be replaced with Redis
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+import { Logger } from '@nestjs/common';
+
+@Injectable()
+class UserSessionService {
+  private logger = new Logger(UserSessionService.name);
 
   // 10 minutes cron job
   @Cron('0 */10 * * * *')
   async checkCachedSessions() {
     const keys = await this.cacheManager.store.keys();
     for (const userId of keys) {
-      console.log(`Checking user ${userId}`);
+      this.logger.log(`Checking user ${userId}`);
 
       const user = await this.em.findOne(User, userId);
       if (!user) {
-        console.log(`User ${userId} not found`);
+        this.logger.warn(`User ${userId} not found`);
         continue;
       }
 
       const lastSession = await this.cacheManager.get<Date>(userId);
       if (!lastSession) {
-        console.log(`User ${userId} last session not found`);
+        this.logger.warn(`User ${userId} last session not found`);
         continue;
       }
 
@@ -43,10 +48,10 @@ export class UserSessionService {
         new Date().getTime() - lastSession.getTime() > this.expiredSessionTime;
       if (!isExpired) continue;
 
-      console.log(`User ${userId} last session expired, persisting...`);
+      this.logger.log(`User ${userId} last session expired, persisting...`);
       await this.persistUserSessionTime(user, lastSession);
       await this.cacheManager.del(userId);
-      console.log(`User ${userId} last session persisted`);
+      this.logger.log(`User ${userId} last session persisted`);
     }
   }
 
