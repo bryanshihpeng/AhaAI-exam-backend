@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import * as process from 'process';
 import { User } from '../../domain/user/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -29,6 +30,7 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'Registration successful, verification email sent',
+    type: User,
   })
   @ApiResponse({
     status: 400,
@@ -104,7 +106,11 @@ export class AuthController {
   }
 
   respondJwt(jwt: string, response: Response) {
-    response.cookie('jwt', jwt, { httpOnly: true, domain: 'localhost' });
+    response.cookie('jwt', jwt, {
+      httpOnly: true,
+      secure: true,
+      domain: process.env.COOKIE_DOMAIN,
+    });
     response.status(HttpStatus.OK).json({});
   }
 

@@ -4,30 +4,24 @@ import { v4 } from 'uuid';
 
 @Entity()
 export class User extends BaseEntity {
+  static passWordRules =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   @PrimaryKey()
   id = v4();
-
   @Property({ type: 'datetime', defaultRaw: 'NOW()' })
   signUpAt = new Date();
-
   @Property({ type: 'number', default: 0 })
   loginCount = 0;
-
   @Property({ type: 'datetime', defaultRaw: 'NOW()' })
   lastSessionAt?: Date;
-
   @Property({ unique: true, nullable: true })
   email: string;
-
   @Property()
   name = '';
-
   @Property({ nullable: true })
   firebaseUid?: string;
-
   @Property({ nullable: true })
   emailVerified?: boolean;
-
   @Property({ nullable: true })
   password?: string;
 
@@ -64,8 +58,6 @@ export class User extends BaseEntity {
   }
 
   validatePassword(password: string): boolean {
-    const regex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return regex.test(password);
+    return User.passWordRules.test(password);
   }
 }

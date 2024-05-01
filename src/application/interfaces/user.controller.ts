@@ -7,21 +7,8 @@ import { JWTGuard } from '../auth/jwt.guard';
 import { ResetPasswordRequest } from './dto/reset-password.request';
 import { UpdateUserProfileRequest } from './dto/update-user-profile.request';
 import { UserDashboardResponse } from './dto/user-dashboard.response';
+import { UserProfileResponse } from './dto/user-profile.response';
 import { UserStatisticsResponse } from './dto/user-statistics.response';
-
-// Annotations:
-//
-//   CQRS Model and Read-Only Operations:
-//   This code example demonstrates how to provide read-only operations for the User module, which aligns with the CQRS (Command Query Responsibility Separation) model. This model separates command operations (such as modifying or inserting) from query operations to enhance maintainability and performance.
-//   In this example, we implement the read-only operations as a set of simple queries (getProfile, getAllUsers, and getUserStatistics) directly in the Controller rather than abstracting them into the service layer.
-//   Why Read-Only Operations Can Be in the Controller:
-//   Read-only operations can often be directly implemented in the Controller because they tend to be relatively simple and self-contained.
-//   By implementing these queries directly in the Controller, we avoid over-engineering and simplify the code structure.
-//   If future read-only operations become more complex or need to be reused, we can consider abstracting them into the service layer.
-//   Conclusion:
-// When implementing read-only operations, consider the CQRS model, separating them from command operations.
-//   For read-only operations, they can be directly implemented in the Controller to avoid over-engineering.
-//   Only consider abstracting them into the service layer when further optimization and reuse are needed.
 
 @ApiTags('User')
 @UseGuards(JWTGuard)
@@ -34,7 +21,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User profile data',
-    type: User,
+    type: UserProfileResponse,
   })
   async getUserProfile(@CurrentUser() user: User) {
     return user.toObject(['password']);
@@ -53,7 +40,6 @@ export class UserController {
     // Can only update name
     user.name = body.name;
     await this.em.persistAndFlush(user);
-    return { email: user.email, name: user.name };
   }
 
   @Patch('reset-password')
@@ -81,8 +67,8 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'List of all users',
-    type: UserDashboardResponse,
     isArray: true,
+    type: UserDashboardResponse,
   })
   async getAllUsers(): Promise<UserDashboardResponse[]> {
     const users = await this.em.find(User, {});

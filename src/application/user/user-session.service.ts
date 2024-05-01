@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Cron } from '@nestjs/schedule';
 import { User } from '../../domain/user/user.entity';
@@ -13,17 +13,13 @@ import {
 export class UserSessionService {
   // 10 minutes
   private expiredSessionTime = 1000 * 60 * 10;
+  private logger = new Logger(UserSessionService.name);
 
   constructor(
     private em: EntityManager,
     // In memory cache, can be replaced with Redis
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
-import { Logger } from '@nestjs/common';
-
-@Injectable()
-class UserSessionService {
-  private logger = new Logger(UserSessionService.name);
 
   // 10 minutes cron job
   @Cron('0 */10 * * * *')
@@ -57,21 +53,21 @@ class UserSessionService {
 
   @OnEvent('user.activity.happened', { async: true })
   async onUserActivityHappened(event: UserActivityHappenedEvent) {
-    console.log(`User ${event.userId} activity happened`);
+    this.logger.log(`User ${event.userId} activity happened`);
     const user = await this.em.findOne(User, event.userId);
     if (user) {
       await this.cacheLastSessionTime(user, event.activityTime);
     } else {
-      console.log(`User with id ${event.userId} not found`);
+      this.logger.log(`User with id ${event.userId} not found`);
     }
   }
 
   @OnEvent('user.logged.in', { async: true })
   async onUserLoggedIn(event: UserLoggedInEvent) {
-    console.log(`User ${event.userId} logged in`);
+    this.logger.log(`User ${event.userId} logged in`);
     const user = await this.em.findOne(User, event.userId);
     if (!user) {
-      console.log(`User with id ${event.userId} not found`);
+      this.logger.log(`User with id ${event.userId} not found`);
       return;
     }
 
