@@ -2,7 +2,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { SignupWithEmailRequest } from './dto/signup-with-email.request';
 
 @ApiTags('Authentication')

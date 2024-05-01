@@ -1,16 +1,19 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
 import * as SgMail from '@sendgrid/mail';
 import axios from 'axios';
 import * as jwt from 'jsonwebtoken';
 import { User } from '../../domain/user/user.entity';
+import { UserLoggedInEvent } from '../user/user-activity.event';
 
 @Injectable()
 export class AuthService {
   constructor(
     private em: EntityManager,
     private jwtService: JwtService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async signUp(email: string, password: string): Promise<User> {
@@ -35,6 +38,7 @@ export class AuthService {
     if (!account.verifyPassword(password)) {
       throw new BadRequestException('Invalid password');
     }
+    this.eventEmitter.emit('user.logged.in', new UserLoggedInEvent(account.id));
     return this.generateJwt(account);
   }
 
