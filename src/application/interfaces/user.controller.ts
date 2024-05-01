@@ -1,8 +1,9 @@
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '../../domain/user/user.entity';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { JWTGuard } from '../auth/jwt.guard';
 import { ResetPasswordRequest } from './dto/reset-password.request';
 import { UpdateUserProfileRequest } from './dto/update-user-profile.request';
 import { UserDashboardResponse } from './dto/user-dashboard.response';
@@ -23,6 +24,7 @@ import { UserStatisticsResponse } from './dto/user-statistics.response';
 //   Only consider abstracting them into the service layer when further optimization and reuse are needed.
 
 @ApiTags('User')
+@UseGuards(JWTGuard)
 @Controller('user')
 export class UserController {
   constructor(private em: EntityManager) {}
@@ -35,7 +37,7 @@ export class UserController {
     type: User,
   })
   async getUserProfile(@CurrentUser() user: User) {
-    return { email: user.email, name: user.name };
+    return user.toObject(['password']);
   }
 
   @Patch('profile')
