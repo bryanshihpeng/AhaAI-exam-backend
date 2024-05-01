@@ -71,8 +71,11 @@ export class AuthController {
     status: 400,
     description: 'Bad Request, invalid Firebase token',
   })
-  async signInWithFirebase(@Body() token: string, @Res() response: Response) {
-    const jwt = await this.authService.signInWithFirebase(token);
+  async signInWithFirebase(
+    @Body() body: { token: string },
+    @Res() response: Response,
+  ) {
+    const jwt = await this.authService.signInWithFirebase(body.token);
     this.respondJwt(jwt, response);
   }
 

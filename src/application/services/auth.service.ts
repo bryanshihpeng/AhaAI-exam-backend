@@ -110,7 +110,7 @@ export class AuthService {
   }
 
   async validateFirebaseIdToken(idToken: string): Promise<string> {
-    const decodedToken = jwt.decode(idToken);
+    const decodedToken = jwt.decode(idToken, { complete: true });
     if (
       !decodedToken ||
       typeof decodedToken !== 'object' ||
