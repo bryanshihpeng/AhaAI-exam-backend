@@ -20,6 +20,7 @@ export class EmailService {
       subject: subject,
       html: htmlContent,
     };
+    //TODO: Retry sending email if failed
     try {
       const res = await SgMail.send(msg);
       this.logger.log('Email sent:', res);
