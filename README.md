@@ -32,6 +32,29 @@ of concerns and high modularity.
 
 ```
 
+│ │ └── Migration20240501034301_user_statistics.ts # Migration for user statistics.
+│ └── email.service.ts # Service for sending emails via SendGrid.
+└── main.ts # Entry point of the application.
+
+### Managing Database Migrations
+
+To manage database migrations using Mikro-ORM, you can use the Mikro-ORM CLI. Here are some common commands:
+
+```bash
+# Create a new migration
+$ npx mikro-orm migration:create --name {migration-name}
+
+# Apply migrations to update the database to the latest version
+$ npx mikro-orm migration:up
+
+# Revert the last migration
+$ npx mikro-orm migration:down
+```
+
+These commands help you manage your database schema changes effectively. For example, to create a new migration file for
+user-related changes, you would use the `migration:create` command with an appropriate name. After creating migrations,
+use the `migration:up` command to apply them.
+
 ## Installation
 
 ```bash
