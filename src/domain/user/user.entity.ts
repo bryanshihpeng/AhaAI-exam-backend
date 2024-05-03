@@ -44,19 +44,23 @@ export class User extends BaseEntity {
   }
 
   resetPassword(password: string, newPassword: string): void {
-    this.validatePassword(newPassword);
+    if (!this.validatePassword(newPassword)) {
+      throw new BadRequestException(
+        'New password does not meet complexity requirements',
+      );
+    }
     this.verifyPassword(password);
     this.setPassword(newPassword);
   }
 
   setPassword(password: string): void {
-    this.validatePassword(password);
-    this.password = this.hashPassword(password);
-  }
+    if (!this.validatePassword(password)) {
+      throw new BadRequestException(
+        'Password does not meet complexity requirements',
+      );
+    }
 
-  hashPassword(password: string): string {
-    const saltRounds = 10;
-    return bcrypt.hashSync(password, saltRounds);
+    this.password = this.hashPassword(password);
   }
 
   verifyPassword(password: string) {
@@ -67,9 +71,15 @@ export class User extends BaseEntity {
     if (!isVerified) {
       throw new BadRequestException('Invalid password');
     }
+    return true;
   }
 
-  private validatePassword(password: string): boolean {
+  validatePassword(password: string): boolean {
     return User.passWordRules.test(password);
+  }
+
+  private hashPassword(password: string): string {
+    const saltRounds = 10;
+    return bcrypt.hashSync(password, saltRounds);
   }
 }
