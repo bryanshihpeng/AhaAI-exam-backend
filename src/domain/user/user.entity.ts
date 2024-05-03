@@ -1,4 +1,10 @@
-import { BaseEntity, Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  BaseEntity,
+  Entity,
+  Index,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { v4 } from 'uuid';
@@ -19,13 +25,15 @@ export class User extends BaseEntity {
   @Property({ type: 'datetime', defaultRaw: 'NOW()' })
   lastSessionAt?: Date;
 
+  @Index()
   @Property({ unique: true, nullable: true })
   email: string;
 
   @Property()
   name = '';
 
-  @Property({ nullable: true })
+  @Index()
+  @Property({ unique: true, nullable: true })
   firebaseUid?: string;
 
   @Property({ nullable: true })
