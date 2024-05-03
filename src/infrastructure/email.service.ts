@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as SgMail from '@sendgrid/mail';
 
 @Injectable()
 export class EmailService {
+  logger = new Logger(EmailService.name);
+
   constructor() {
     SgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
@@ -20,9 +22,9 @@ export class EmailService {
     };
     try {
       const res = await SgMail.send(msg);
-      console.log('Email sent:', res);
+      this.logger.log('Email sent:', res);
     } catch (error) {
-      console.error('Error sending email:', error);
+      this.logger.error('Error sending email:', error);
     }
   }
 }

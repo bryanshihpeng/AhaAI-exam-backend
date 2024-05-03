@@ -24,8 +24,8 @@ export class UserSessionService {
   // 10 minutes cron job
   @Cron('0 */10 * * * *')
   async checkCachedSessions() {
-    const keys = await this.cacheManager.store.keys();
-    for (const userId of keys) {
+    const userIds = await this.cacheManager.store.keys();
+    for (const userId of userIds) {
       this.logger.log(`Checking user ${userId}`);
 
       const user = await this.em.findOne(User, userId);
@@ -40,9 +40,7 @@ export class UserSessionService {
         continue;
       }
 
-      const isExpired =
-        new Date().getTime() - lastSession.getTime() > this.expiredSessionTime;
-      if (!isExpired) continue;
+      if (!this.isSessionExpired(lastSession)) continue;
 
       this.logger.log(`User ${userId} last session expired, persisting...`);
       await this.persistUserSessionTime(user, lastSession);
@@ -83,5 +81,11 @@ export class UserSessionService {
   private async cacheLastSessionTime(user: User, lastSession: Date) {
     const cacheKey = `${user.id}`;
     await this.cacheManager.set(cacheKey, lastSession);
+  }
+
+  private isSessionExpired(lastSession: Date): boolean {
+    return (
+      new Date().getTime() - lastSession.getTime() > this.expiredSessionTime
+    );
   }
 }
