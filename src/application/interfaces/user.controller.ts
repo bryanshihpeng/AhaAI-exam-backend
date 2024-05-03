@@ -3,7 +3,7 @@ import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '../../domain/user/user.entity';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { JwtGuard } from '../auth/jwt-guard.service';
+import { JwtGuard } from '../auth/jwt.guard';
 import { ResetPasswordRequest } from './dto/reset-password.request';
 import { UpdateUserProfileRequest } from './dto/update-user-profile.request';
 import { UserDashboardResponse } from './dto/user-dashboard.response';

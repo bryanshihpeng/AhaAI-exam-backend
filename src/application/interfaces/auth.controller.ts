@@ -13,7 +13,7 @@ import * as process from 'process';
 import { User } from '../../domain/user/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { JwtGuard } from '../auth/jwt-guard.service';
+import { JwtGuard } from '../auth/jwt.guard';
 import { SignupWithEmailRequest } from './dto/signup-with-email.request';
 
 @ApiTags('Authentication')

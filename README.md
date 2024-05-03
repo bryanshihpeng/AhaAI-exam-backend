@@ -9,31 +9,27 @@ of concerns and high modularity.
 ### Folder Structure
 
 ```
-src/
-├── application/
-│   ├── auth/
-│   │   ├── jwt-guard.service.ts
-│   │   ├── auth.service.ts
-│   │   └── current-user.decorator.ts
-│   ├── interfaces/
-│   │   ├── auth.controller.ts
-│   │   ├── user.controller.ts
-│   │   └── dto/
-│   │       ├── signup-with-email.request.ts
-│   │       ├── user-profile.response.ts
-│   │       └── reset-password.request.ts
-├── domain/
-│   └── user/
-│       ├── user.entity.ts
-│       └── user.entity.spec.ts
-├── infrastructure/
-│   ├── orm/
-│   │   ├── mikro-orm.config.ts
-│   │   └── migrations/
-│   │       ├── Migration20240501024315.ts
-│   │       └── Migration20240501034301_user_statistics.ts
-│   └── email.service.ts
-└── main.ts
+ src/
+ ├── application/
+ │   ├── auth/
+ │   │   ├── jwt.guard.ts               # Guards for JWT authentication.
+ │   │   ├── auth.service.ts            # Handles all authentication logic.
+ │   │   └── current-user.decorator.ts  # Custom decorator for accessing the current user.
+ │   ├── interfaces/
+ │   │   ├── auth.controller.ts         # Controller for authentication-related endpoints.
+ │   │   ├── user.controller.ts         # Controller for user-related operations.
+ │   │   └── dto/                       # Data transfer objects for API requests and responses.
+ ├── domain/
+ │   └── user/
+ │       ├── user.entity.ts             # User entity definition.
+ │       └── user.entity.spec.ts        # Tests for user entity behaviors.
+ ├── infrastructure/
+ │   ├── orm/
+ │   │   ├── mikro-orm.config.ts        # MikroORM configuration.
+ │   │   └── migrations/                # Database migrations.
+ │   └── email.service.ts               # Service for sending emails via SendGrid.
+ └── main.ts                            # Entry point of the application.
+
 ```
 
 ## Installation
