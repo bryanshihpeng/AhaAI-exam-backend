@@ -4,10 +4,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Cron } from '@nestjs/schedule';
 import { User } from '../../domain/user/user.entity';
-import {
-  UserActivityHappenedEvent,
-  UserLoggedInEvent,
-} from './user-activity.event';
+import { UserActivityHappenedEvent } from './user-activity.event';
+import { UserLoggedInEvent } from './user-loged-in.event';
 
 @Injectable()
 export class UserSessionService {

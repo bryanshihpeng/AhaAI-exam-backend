@@ -7,7 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import * as process from 'process';
 import { User } from '../../domain/user/user.entity';
 import { EmailService } from '../../infrastructure/email.service';
-import { UserLoggedInEvent } from '../user/user-activity.event';
+import { UserLoggedInEvent } from '../user/user-loged-in.event';
 
 @Injectable()
 export class AuthService {

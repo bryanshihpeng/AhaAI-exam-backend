@@ -4,7 +4,3 @@ export class UserActivityHappenedEvent {
     public readonly activityTime: Date,
   ) {}
 }
-
-export class UserLoggedInEvent {
-  constructor(public readonly userId: string) {}
-}
