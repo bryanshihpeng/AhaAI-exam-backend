@@ -52,6 +52,11 @@ export class User extends BaseEntity {
   }
 
   resetPassword(password: string, newPassword: string): void {
+    if (password == newPassword) {
+      throw new BadRequestException(
+        'New password cannot be the same as the old password',
+      );
+    }
     if (!this.validatePassword(newPassword)) {
       throw new BadRequestException(
         'New password does not meet complexity requirements',
