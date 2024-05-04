@@ -57,6 +57,9 @@ export class AuthService {
     if (!account) {
       throw new BadRequestException('Invalid token');
     }
+    if (account.emailVerified) {
+      throw new BadRequestException('Email already verified');
+    }
     account.emailVerified = true;
     await this.em.persistAndFlush(account);
 

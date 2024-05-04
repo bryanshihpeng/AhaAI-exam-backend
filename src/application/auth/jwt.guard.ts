@@ -13,7 +13,7 @@ import { UserActivityHappenedEvent } from '../user/user-activity.event';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
-  loggger = new Logger(JwtGuard.name);
+  logger = new Logger(JwtGuard.name);
 
   constructor(
     private readonly jwtService: JwtService,
@@ -37,7 +37,7 @@ export class JwtGuard implements CanActivate {
 
       return true;
     } catch (e) {
-      this.loggger.log(e);
+      this.logger.log(e);
       throw new UnauthorizedException();
     }
   }
