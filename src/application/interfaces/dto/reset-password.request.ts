@@ -23,17 +23,4 @@ export class ResetPasswordRequest {
       'Password must include at least one lower case letter, one upper case letter, one digit, and one special character.',
   })
   newPassword: string;
-
-  @ApiProperty({
-    example: 'NewPassword@123',
-    description: 'Re-enter the new password for confirmation',
-    type: 'string',
-  })
-  @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  @Matches(User.passWordRules, {
-    message:
-      'Password must include at least one lower case letter, one upper case letter, one digit, and one special character.',
-  })
-  confirmNewPassword: string;
 }

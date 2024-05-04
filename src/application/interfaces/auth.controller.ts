@@ -55,7 +55,7 @@ export class AuthController {
     description: 'Bad Request, invalid or expired token',
   })
   async verifyEmailAndSignIn(@Body() body: { token: string }) {
-    return this.authService.verifyEmail(body.token);
+    return { jwt: await this.authService.verifyEmail(body.token) };
   }
 
   @Post('firebase')

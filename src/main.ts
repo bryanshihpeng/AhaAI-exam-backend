@@ -4,7 +4,13 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const config = new DocumentBuilder().setTitle('Aha AI Exam').build();
+  const config = new DocumentBuilder()
+    .setTitle('Aha AI Exam API')
+    .setDescription('The API documentation for Aha AI Exam')
+    .setVersion('1.0.0')
+    .addTag('User')
+    .addTag('Authentication')
+    .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
