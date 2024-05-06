@@ -47,7 +47,7 @@ export class AuthController {
   @Post('verify-email')
   @ApiOperation({ summary: 'Verify email and sign in' })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Email verified and sign in successful, JWT provided',
   })
   @ApiResponse({

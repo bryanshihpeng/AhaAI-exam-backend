@@ -43,7 +43,8 @@ export class User extends BaseEntity {
   private password?: string;
 
   static createWithEmailAndPassword(email: string, password: string): User {
-    if (!email || !password) throw new Error('Email and password are required');
+    if (!email) throw new BadRequestException('Email is required');
+    if (!password) throw new BadRequestException('Password is required');
     const user = new User();
     user.email = email;
     user.emailVerified = false;
