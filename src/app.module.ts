@@ -5,11 +5,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthService } from './application/auth/auth.service';
-import { AuthController } from './application/interfaces/auth.controller';
-import { UserController } from './application/interfaces/user.controller';
 import { UserSessionService } from './application/user/user-session.service';
 import { EmailService } from './infrastructure/email.service';
 import { dbConfig } from './infrastructure/orm/mikro-orm.config';
+import { AuthController } from './interface/auth.controller';
+import { UserController } from './interface/user.controller';
 
 @Module({
   imports: [

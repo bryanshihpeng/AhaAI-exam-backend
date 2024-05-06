@@ -1,9 +1,9 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { User } from '../../domain/user/user.entity';
-import { AuthService } from '../auth/auth.service';
-import { CurrentUser } from '../auth/current-user.decorator';
-import { JwtGuard } from '../auth/jwt.guard';
+import { AuthService } from '../application/auth/auth.service';
+import { CurrentUser } from '../application/auth/current-user.decorator';
+import { JwtGuard } from '../application/auth/jwt.guard';
+import { User } from '../domain/user/user.entity';
 import { SignupWithEmailRequest } from './dto/signup-with-email.request';
 
 @ApiTags('Authentication')

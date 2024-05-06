@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as SuperTest from 'supertest';
 import { AppModule } from '../src/app.module';
-import { SignupWithEmailRequest } from '../src/application/interfaces/dto/signup-with-email.request';
+import { SignupWithEmailRequest } from '../src/interface/dto/signup-with-email.request';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
