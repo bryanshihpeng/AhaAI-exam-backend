@@ -22,6 +22,8 @@ export class User extends BaseEntity {
   @Property({ type: 'number', default: 0 })
   loginCount = 0;
 
+  // Index for counting active users
+  @Index()
   @Property({ type: 'datetime', defaultRaw: 'NOW()' })
   lastSessionAt?: Date;
 

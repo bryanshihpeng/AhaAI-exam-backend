@@ -80,10 +80,15 @@ export class AuthService {
 
   async signInWithFirebase(idToken: string): Promise<string> {
     const payload = await this.validateFirebaseIdToken(idToken);
-    const account = await this.em.findOne(User, {
-      firebaseUid: payload.firebaseUid,
-    });
+    const account = await this.em.findOne(User, [
+      { firebaseUid: payload.firebaseUid },
+      { email: payload.email },
+    ]);
     if (account) {
+      if (!account.firebaseUid) {
+        account.firebaseUid = payload.firebaseUid;
+        await this.em.persistAndFlush(account);
+      }
       return this.generateJwt(account);
     }
 
@@ -109,7 +114,7 @@ export class AuthService {
     return this.generateJwt(newAccount);
   }
 
-  async validateFirebaseIdToken(idToken: string) {
+  private async validateFirebaseIdToken(idToken: string) {
     const decodedToken = jwt.decode(idToken, { complete: true });
     if (
       !decodedToken ||

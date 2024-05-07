@@ -71,7 +71,11 @@ export class UserController {
     type: UserDashboardResponse,
   })
   async getAllUsers(): Promise<UserDashboardResponse[]> {
-    const users = await this.em.find(User, {});
+    const users = await this.em.find(
+      User,
+      {},
+      { orderBy: { lastSessionAt: 'DESC' } },
+    );
     return users.map((user) => ({
       id: user.id,
       signUpAt: user.signUpAt,
